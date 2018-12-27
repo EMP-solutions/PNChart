@@ -11,11 +11,13 @@
 #import "PNChartDelegate.h"
 #import "PNBar.h"
 
-#define kXLabelMargin 15
-#define kYLabelMargin 15
+#define isPad UI_USER_INTERFACE_IDIOM()
+#define kXLabelMargin isPad?80:15
+#define kYLabelMargin isPad?80:15
+//#define kYLabelHeight isPad?22:11
+//#define kXLabelHeight isPad?40:20
 #define kYLabelHeight 11
 #define kXLabelHeight 20
-
 typedef NSString *(^PNYLabelFormatter)(CGFloat yLabelValue);
 
 @interface PNBarChart : PNGenericChart

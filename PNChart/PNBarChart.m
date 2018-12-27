@@ -56,7 +56,7 @@
     _bars                = [NSMutableArray array];
     _xLabelSkip          = 1;
     _yLabelSum           = 4;
-    _labelMarginTop      = 2;
+    _labelMarginTop      = 0;
     _chartMarginLeft     = 25.0;
     _chartMarginRight    = 25.0;
     _chartMarginTop      = 25.0;
@@ -78,6 +78,7 @@
 
 - (void)setYValues:(NSArray *)yValues
 {
+    
     _yValues = yValues;
   //make the _yLabelSum value dependant of the distinct values of yValues to avoid duplicates on yAxis
 
@@ -90,7 +91,7 @@
 
 - (void)processYMaxValue {
     NSArray *yAxisValues = _yLabels ? _yLabels : _yValues;
-    _yLabelSum = _yLabels ? _yLabels.count - 1 :_yLabelSum;
+    _yLabelSum = _yLabels ? _yLabels.count/2 :_yLabelSum;
     if (_yMaxValue) {
         _yValueMax = _yMaxValue;
     } else {
@@ -98,7 +99,7 @@
     }
 
     if (_yLabelSum==4) {
-        _yLabelSum = yAxisValues.count;
+        _yLabelSum = yAxisValues.count/2;
         (_yLabelSum % 2 == 0) ? _yLabelSum : _yLabelSum++;
     }
 }
@@ -119,6 +120,7 @@
       float yAsixValue = [_yLabels[_yLabels.count - i - 1] floatValue];
       labelText= _yLabelFormatter(yAsixValue);
     } else {
+        
       labelText = _yLabelFormatter((float)_yValueMax * ( (_yLabelSum - i) / (float)_yLabelSum ));
     }
 
@@ -126,11 +128,13 @@
     label.font = _labelFont;
     label.textColor = _labelTextColor;
     [label setTextAlignment:NSTextAlignmentRight];
+    labelText = [labelText stringByReplacingOccurrencesOfString:@"$" withString:@""];
+    labelText = [labelText stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];;
     label.text = [NSString stringWithFormat:@"%@%@%@", _yLabelPrefix, labelText, _yLabelSuffix];
-    
+          //label.backgroundColor = [UIColor whiteColor];
     [self addSubview:label];
       
-    label.frame = (CGRect){0, sectionHeight * i + _chartMarginTop - kYLabelHeight/2.0 + kXLabelHeight + _labelMarginTop, _yChartLabelWidth, kYLabelHeight};
+    label.frame = (CGRect){20, sectionHeight * i + _chartMarginTop - kYLabelHeight/2.0, _yChartLabelWidth, kYLabelHeight};
 
     [_yChartLabels addObject:label];
   }
@@ -149,12 +153,14 @@
    _yValueMax = max ;
 
     if (_yValueMax == 0) {
-        _yValueMax = _yMinValue;
+            //_yValueMax = _yMinValue;
+        _yValueMax = 10;
     }
 }
 
 - (void)setXLabels:(NSArray *)xLabels
 {
+    self.layer.sublayers = nil;
     _xLabels = xLabels;
 
     if (_xChartLabels) {
@@ -163,7 +169,7 @@
         _xChartLabels = [NSMutableArray new];
     }
 
-	_xLabelWidth = (self.frame.size.width - _chartMarginLeft - _chartMarginRight) / [xLabels count];
+	_xLabelWidth = (self.frame.size.width - _chartMarginLeft - _chartMarginRight) / ([xLabels count]);
 
     if (_showLabel) {
         int labelAddCount = 0;
@@ -187,7 +193,7 @@
                     labelXPosition = (index *  _xLabelWidth + _chartMarginLeft + _xLabelWidth /2.0 );
                 }
                 label.center = CGPointMake(labelXPosition,
-                                           self.frame.size.height - _chartMarginTop + label.frame.size.height /2.0 + _labelMarginTop);
+                                           self.frame.size.height - kXLabelHeight - _chartMarginTop + label.frame.size.height /2.0 + _labelMarginTop);
                 labelAddCount = 0;
 
                 [_xChartLabels addObject:label];
@@ -236,7 +242,7 @@
             }
 
             bar = [[PNBar alloc] initWithFrame:CGRectMake(barXPosition, //Bar X position
-                                                          self.frame.size.height - chartCavanHeight - kXLabelHeight - _chartMarginBottom + _chartMarginTop , //Bar Y position
+                                                          self.frame.size.height - chartCavanHeight - kXLabelHeight - _chartMarginBottom , //Bar Y position
                                                           barWidth, // Bar witdh
                                                           self.showLevelLine ? chartCavanHeight/2.0:chartCavanHeight)]; //Bar height
 
@@ -299,9 +305,31 @@
 - (void)strokeChart
 {
     //Add Labels
-
+    
     [self viewCleanupForCollection:_bars];
+    float sectionHeight = (self.frame.size.height - _chartMarginTop - _chartMarginBottom - kXLabelHeight) / _yLabelSum;
 
+    for (int i=0; i<_yLabelSum; i++) {
+        CAShapeLayer* chartLine = [CAShapeLayer layer];
+        chartLine.lineCap      = kCALineCapButt;
+        chartLine.fillColor    = [[UIColor clearColor] CGColor];
+        chartLine.lineWidth    = 1.0;
+        chartLine.strokeEnd    = 0.0;
+        
+        UIBezierPath *progressline2 = [UIBezierPath bezierPath];
+        
+        [progressline2 moveToPoint:CGPointMake(_chartMarginLeft, (i*sectionHeight)+kYLabelHeight/2)];
+        [progressline2 addLineToPoint:CGPointMake(self.frame.size.width - _chartMarginRight, (i*sectionHeight)+kYLabelHeight/2)];
+        
+        [progressline2 setLineWidth:1.0];
+        [progressline2 setLineCapStyle:kCGLineCapSquare];
+        chartLine.path = progressline2.CGPath;
+        chartLine.strokeColor = [_chartBorderColor CGColor];;
+        chartLine.strokeEnd = 1.0;
+        [self addBorderAnimationIfNeeded];
+        
+        [self.layer addSublayer:chartLine];
+    }
 
     //Update Bar
 
@@ -318,8 +346,8 @@
 
         UIBezierPath *progressline = [UIBezierPath bezierPath];
 
-        [progressline moveToPoint:CGPointMake(_chartMarginLeft, self.frame.size.height - kXLabelHeight - _chartMarginBottom + _chartMarginTop)];
-        [progressline addLineToPoint:CGPointMake(self.frame.size.width - _chartMarginRight,  self.frame.size.height - kXLabelHeight - _chartMarginBottom + _chartMarginTop)];
+        [progressline moveToPoint:CGPointMake(_chartMarginLeft, self.frame.size.height - kXLabelHeight - _chartMarginBottom)];
+        [progressline addLineToPoint:CGPointMake(self.frame.size.width - _chartMarginRight,  self.frame.size.height - kXLabelHeight - _chartMarginBottom)];
 
         [progressline setLineWidth:1.0];
         [progressline setLineCapStyle:kCGLineCapSquare];
@@ -334,6 +362,7 @@
         _chartLeftLine = [CAShapeLayer layer];
         _chartLeftLine.lineCap      = kCALineCapButt;
         _chartLeftLine.fillColor    = [[UIColor whiteColor] CGColor];
+        _chartLeftLine.fillColor    = [[UIColor clearColor] CGColor];
         _chartLeftLine.lineWidth    = 1.0;
         _chartLeftLine.strokeEnd    = 0.0;
 
@@ -346,11 +375,14 @@
         [progressLeftline setLineCapStyle:kCGLineCapSquare];
         _chartLeftLine.path = progressLeftline.CGPath;
         _chartLeftLine.strokeColor = [_chartBorderColor CGColor];
+        _chartLeftLine.strokeColor = [[UIColor clearColor] CGColor];
+
         _chartLeftLine.strokeEnd = 1.0;
 
         [self addBorderAnimationIfNeeded];
         [self.layer addSublayer:_chartLeftLine];
-    }
+        
+          }
 
   // Add Level Separator Line
   if (_showLevelLine) {
@@ -416,8 +448,8 @@
 
 - (void)viewCleanupForCollection:(NSMutableArray *)array
 {
-    if (array.count) {
-        [array makeObjectsPerformSelector:@selector(removeFromSuperview)];
+    if (array.count > 0) {
+        //[array makeObjectsPerformSelector:@selector(removeFromSuperview)];
         [array removeAllObjects];
     }
 }

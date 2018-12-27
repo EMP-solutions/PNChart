@@ -12,7 +12,7 @@
 
 @interface PNPieChart()<CAAnimationDelegate>
 
-@property (nonatomic) NSArray *items;
+    //@property (nonatomic) NSArray *items;
 @property (nonatomic) NSArray *endPercentages;
 
 @property (nonatomic) UIView         *contentView;
@@ -60,14 +60,8 @@
 
 - (void)baseInit{
     _selectedItems = [NSMutableDictionary dictionary];
-    //在绘制圆形时,应当考虑矩形的宽和高的大小问题,当宽大于高时,绘制饼图时,会超出整个view的范围,因此建议在此处进行判断
-    
-    CGFloat minimal = (CGRectGetWidth(self.bounds) < CGRectGetHeight(self.bounds)) ? CGRectGetWidth(self.bounds) : CGRectGetHeight(self.bounds);
-    
-    _outerCircleRadius  = minimal / 2;
-    _innerCircleRadius  = minimal / 6;
-//    _outerCircleRadius  = CGRectGetWidth(self.bounds) / 2;
-//    _innerCircleRadius  = CGRectGetWidth(self.bounds) / 6;
+    _outerCircleRadius  = CGRectGetWidth(self.bounds) / 2;
+    _innerCircleRadius  = CGRectGetWidth(self.bounds) / 2.2;
     _descriptionTextColor = [UIColor whiteColor];
     _descriptionTextFont  = [UIFont fontWithName:@"Avenir-Medium" size:18.0];
     _descriptionTextShadowColor  = [[UIColor blackColor] colorWithAlphaComponent:0.4];
@@ -87,7 +81,7 @@
     NSMutableArray *endPercentages = [NSMutableArray new];
     [_items enumerateObjectsUsingBlock:^(PNPieChartDataItem *item, NSUInteger idx, BOOL *stop) {
         if (total == 0){
-            [endPercentages addObject:@(1.0 / _items.count * (idx + 1))];
+            [endPercentages addObject:@(1.0 / self.items.count * (idx + 1))];
         }else{
             currentTotal += item.value;
             [endPercentages addObject:@(currentTotal / total)];
@@ -107,11 +101,8 @@
 
 /** Override this to change how inner attributes are computed. **/
 - (void)recompute {
-    
-    //同理
-    CGFloat minimal = (CGRectGetWidth(self.bounds) < CGRectGetHeight(self.bounds)) ? CGRectGetWidth(self.bounds) : CGRectGetHeight(self.bounds);
-    self.outerCircleRadius = minimal / 2;
-    self.innerCircleRadius = minimal / 6;
+    self.outerCircleRadius = CGRectGetWidth(self.bounds) / 2;
+    self.innerCircleRadius = CGRectGetWidth(self.bounds) / 2.2;
 }
 
 #pragma mark -
@@ -152,36 +143,37 @@
 }
 
 - (UILabel *)descriptionLabelForItemAtIndex:(NSUInteger)index{
-    PNPieChartDataItem *currentDataItem = [self dataItemForIndex:index];
+   // PNPieChartDataItem *currentDataItem = [self dataItemForIndex:index];
     CGFloat distance = _innerCircleRadius + (_outerCircleRadius - _innerCircleRadius) / 2;
     CGFloat centerPercentage = ([self startPercentageForItemAtIndex:index] + [self endPercentageForItemAtIndex:index])/ 2;
     CGFloat rad = centerPercentage * 2 * M_PI;
     
     UILabel *descriptionLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 100, 80)];
-    NSString *titleText = currentDataItem.textDescription;
+   // NSString *titleText = currentDataItem.textDescription;
     
-    NSString *titleValue;
+  //  NSString *titleValue;
     
-    if (self.showAbsoluteValues) {
-        titleValue = [NSString stringWithFormat:@"%.0f",currentDataItem.value];
-    }else{
-        titleValue = [NSString stringWithFormat:@"%.0f%%",[self ratioForItemAtIndex:index] * 100];
-    }
-    
-    if (self.hideValues)
-        descriptionLabel.text = titleText;
-    else if(!titleText || self.showOnlyValues)
-        descriptionLabel.text = titleValue;
-    else {
-        NSString* str = [titleValue stringByAppendingString:[NSString stringWithFormat:@"\n%@",titleText]];
-        descriptionLabel.text = str ;
-    }
+//    if (self.showAbsoluteValues) {
+//        titleValue = [NSString stringWithFormat:@"%.0f",currentDataItem.value];
+//    }else{
+//        titleValue = [NSString stringWithFormat:@"%.0f%%",[self ratioForItemAtIndex:index] * 100];
+//    }
+//    
+//    if (self.hideValues)
+//        descriptionLabel.text = titleText;
+//    else if(!titleText || self.showOnlyValues)
+//        descriptionLabel.text = titleValue;
+//    else {
+//        NSString* str = [titleValue stringByAppendingString:[NSString stringWithFormat:@"\n%@",titleText]];
+//        descriptionLabel.text = str ;
+//    }
     
     //If value is less than cutoff, show no label
     if ([self ratioForItemAtIndex:index] < self.labelPercentageCutoff )
     {
         descriptionLabel.text = nil;
     }
+    
     
     CGPoint center = CGPointMake(_outerCircleRadius + distance * sin(rad),
                                  _outerCircleRadius - distance * cos(rad));
@@ -421,9 +413,6 @@
     NSUInteger rowMaxHeight = 0;
     
     for (PNPieChartDataItem *pdata in self.items) {
-        if (!pdata.textDescription) {
-            break;
-        }
         /* Expected label size*/
         CGSize labelsize = [PNLineChart sizeOfString:pdata.textDescription
                                            withWidth:maxLabelWidth

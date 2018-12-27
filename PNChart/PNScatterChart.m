@@ -244,7 +244,7 @@
                 for (NSUInteger i = 0; i < chartData.itemCount; i++) {
                     yValue = chartData.getData(i).y;
                     xValue = chartData.getData(i).x;
-                    if (!(xValue >= _AxisX_minValue && xValue <= _AxisX_maxValue) || !(yValue >= _AxisY_minValue && yValue <= _AxisY_maxValue)) {
+                    if (!(xValue >= self.AxisX_minValue && xValue <= self.AxisX_maxValue) || !(yValue >= self.AxisY_minValue && yValue <= self.AxisY_maxValue)) {
                         NSLog(@"input is not in correct range.");
                         exit(0);
                     }

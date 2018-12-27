@@ -11,15 +11,11 @@
 #import "PNGenericChart.h"
 #import "PNChartDelegate.h"
 
-#if __IPHONE_OS_VERSION_MAX_ALLOWED < __IPHONE_10_0
 @interface PNPieChart : PNGenericChart
-#else
-@interface PNPieChart : PNGenericChart <CAAnimationDelegate>
-#endif
 
 - (id)initWithFrame:(CGRect)frame items:(NSArray *)items;
 
-@property (nonatomic, readonly) NSArray	*items;
+@property (nonatomic) NSArray *items;
 
 /** Default is 18-point Avenir Medium. */
 @property (nonatomic) UIFont  *descriptionTextFont;

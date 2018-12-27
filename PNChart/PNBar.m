@@ -62,7 +62,7 @@
         _chartLine.strokeColor = [_barColor CGColor];
     }
     else {
-        _chartLine.strokeColor = [PNGreen CGColor];
+        _chartLine.strokeColor = [[UIColor colorWithRed:28.0/255.0 green:123.0/255.0 blue:241.0/255.0 alpha:1] CGColor];
     }
 
     if (_grade) {
@@ -125,7 +125,7 @@
 - (void)rollBack
 {
     [UIView animateWithDuration:0.3 delay:0.0 options:UIViewAnimationOptionCurveEaseOut animations: ^{
-        _chartLine.strokeColor = [UIColor clearColor].CGColor;
+        self.chartLine.strokeColor = [UIColor clearColor].CGColor;
     } completion:nil];
 }
 
