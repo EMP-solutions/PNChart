@@ -66,6 +66,7 @@
     _chartBorderColor    = PNLightGrey;
     _showLevelLine       = NO;
     _yChartLabelWidth    = 18;
+    _yChartLabelHeight   = 11;
     _rotateForXAxisText  = false;
     _isGradientShow      = YES;
     _isShowNumbers       = YES;
@@ -134,7 +135,7 @@
           //label.backgroundColor = [UIColor whiteColor];
     [self addSubview:label];
       
-    label.frame = (CGRect){20, sectionHeight * i + _chartMarginTop - kYLabelHeight/2.0, _yChartLabelWidth, kYLabelHeight};
+    label.frame = (CGRect){20, sectionHeight * i + _chartMarginTop - _yChartLabelHeight/2.0, _yChartLabelWidth, _yChartLabelHeight};
 
     [_yChartLabels addObject:label];
   }
@@ -318,8 +319,8 @@
         
         UIBezierPath *progressline2 = [UIBezierPath bezierPath];
         
-        [progressline2 moveToPoint:CGPointMake(_chartMarginLeft, (i*sectionHeight)+kYLabelHeight/2)];
-        [progressline2 addLineToPoint:CGPointMake(self.frame.size.width - _chartMarginRight, (i*sectionHeight)+kYLabelHeight/2)];
+        [progressline2 moveToPoint:CGPointMake(_chartMarginLeft, (i*sectionHeight)+_yChartLabelHeight/2)];
+        [progressline2 addLineToPoint:CGPointMake(self.frame.size.width - _chartMarginRight, (i*sectionHeight)+_yChartLabelHeight/2)];
         
         [progressline2 setLineWidth:1.0];
         [progressline2 setLineCapStyle:kCGLineCapSquare];

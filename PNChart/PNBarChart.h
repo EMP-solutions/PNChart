@@ -16,7 +16,7 @@
 #define kYLabelMargin isPad?80:15
 //#define kYLabelHeight isPad?22:11
 //#define kXLabelHeight isPad?40:20
-#define kYLabelHeight 11
+#define kYLabelHeight isPad?16:11
 #define kXLabelHeight 20
 typedef NSString *(^PNYLabelFormatter)(CGFloat yLabelValue);
 
@@ -44,6 +44,8 @@ typedef NSString *(^PNYLabelFormatter)(CGFloat yLabelValue);
 
 /** Changes chart margin. */
 @property (nonatomic) CGFloat yChartLabelWidth;
+@property (nonatomic) CGFloat yChartLabelHeight;
+
 
 /** Formats the ylabel text. */
 @property (copy) PNYLabelFormatter yLabelFormatter;
