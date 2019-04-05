@@ -65,4 +65,5 @@
 
 - (void)recompute;
 
+- (void)didTouchAt:(CGPoint)touchLocation;
 @end

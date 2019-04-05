@@ -61,7 +61,7 @@
 - (void)baseInit{
     _selectedItems = [NSMutableDictionary dictionary];
     _outerCircleRadius  = CGRectGetWidth(self.bounds) / 2;
-    _innerCircleRadius  = CGRectGetWidth(self.bounds) / 2.2;
+    _innerCircleRadius  = CGRectGetWidth(self.bounds) / 6;
     _descriptionTextColor = [UIColor whiteColor];
     _descriptionTextFont  = [UIFont fontWithName:@"Avenir-Medium" size:18.0];
     _descriptionTextShadowColor  = [[UIColor blackColor] colorWithAlphaComponent:0.4];
@@ -102,7 +102,7 @@
 /** Override this to change how inner attributes are computed. **/
 - (void)recompute {
     self.outerCircleRadius = CGRectGetWidth(self.bounds) / 2;
-    self.innerCircleRadius = CGRectGetWidth(self.bounds) / 2.2;
+ //   self.innerCircleRadius = CGRectGetWidth(self.bounds) / 6;
 }
 
 #pragma mark -
@@ -143,30 +143,30 @@
 }
 
 - (UILabel *)descriptionLabelForItemAtIndex:(NSUInteger)index{
-   // PNPieChartDataItem *currentDataItem = [self dataItemForIndex:index];
+    PNPieChartDataItem *currentDataItem = [self dataItemForIndex:index];
     CGFloat distance = _innerCircleRadius + (_outerCircleRadius - _innerCircleRadius) / 2;
     CGFloat centerPercentage = ([self startPercentageForItemAtIndex:index] + [self endPercentageForItemAtIndex:index])/ 2;
     CGFloat rad = centerPercentage * 2 * M_PI;
     
     UILabel *descriptionLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 100, 80)];
-   // NSString *titleText = currentDataItem.textDescription;
+    NSString *titleText = currentDataItem.textDescription;
     
-  //  NSString *titleValue;
+    NSString *titleValue;
     
-//    if (self.showAbsoluteValues) {
-//        titleValue = [NSString stringWithFormat:@"%.0f",currentDataItem.value];
-//    }else{
-//        titleValue = [NSString stringWithFormat:@"%.0f%%",[self ratioForItemAtIndex:index] * 100];
-//    }
-//    
-//    if (self.hideValues)
-//        descriptionLabel.text = titleText;
-//    else if(!titleText || self.showOnlyValues)
-//        descriptionLabel.text = titleValue;
-//    else {
-//        NSString* str = [titleValue stringByAppendingString:[NSString stringWithFormat:@"\n%@",titleText]];
-//        descriptionLabel.text = str ;
-//    }
+    if (self.showAbsoluteValues) {
+        titleValue = [NSString stringWithFormat:@"%.0f",currentDataItem.value];
+    }else{
+        titleValue = [NSString stringWithFormat:@"%.0f%%",[self ratioForItemAtIndex:index] * 100];
+    }
+    
+    if (self.hideValues)
+        descriptionLabel.text = titleText;
+    else if(!titleText || self.showOnlyValues)
+        descriptionLabel.text = titleValue;
+    else {
+        NSString* str = [titleValue stringByAppendingString:[NSString stringWithFormat:@"\n%@",titleText]];
+        descriptionLabel.text = str ;
+    }
     
     //If value is less than cutoff, show no label
     if ([self ratioForItemAtIndex:index] < self.labelPercentageCutoff )
@@ -354,11 +354,58 @@
         {
             [_contentView.layer addSublayer:self.sectorHighlight];
         }
+    }else {
+        if (!self.enableMultipleSelection)
+            {
+            if (self.sectorHighlight)
+                [self.sectorHighlight removeFromSuperlayer];
+            }
+        
+        PNPieChartDataItem *currentItem = [self dataItemForIndex:index];
+        
+        CGFloat red,green,blue,alpha;
+        UIColor *old = currentItem.color;
+        [old getRed:&red green:&green blue:&blue alpha:&alpha];
+       // alpha = 1;
+        UIColor *newColor = [UIColor colorWithRed:red green:green blue:blue alpha:alpha];
+        
+        CGFloat startPercentage = [self startPercentageForItemAtIndex:index];
+        CGFloat endPercentage   = [self endPercentageForItemAtIndex:index];
+        
+        self.sectorHighlight = [self newCircleLayerWithRadius:_outerCircleRadius + 5
+                                                  borderWidth:12
+                                                    fillColor:[UIColor clearColor]
+                                                  borderColor:newColor
+                                              startPercentage:startPercentage
+                                                endPercentage:endPercentage];
+        
+        if (self.enableMultipleSelection)
+            {
+            NSString *dictIndex = [NSString stringWithFormat:@"%d", index];
+            CAShapeLayer *indexShape = [self.selectedItems valueForKey:dictIndex];
+            if (indexShape)
+                {
+                [indexShape removeFromSuperlayer];
+                [self.selectedItems removeObjectForKey:dictIndex];
+                }
+            else
+                {
+                [self.selectedItems setObject:self.sectorHighlight forKey:dictIndex];
+                [_contentView.layer addSublayer:self.sectorHighlight];
+                }
+            }
+        else
+            {
+            [_contentView.layer addSublayer:self.sectorHighlight];
+            }
     }
 }
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
+    if (!_shouldHighlightSectorOnTouch) {
+        return;
+    }
     for (UITouch *touch in touches) {
         CGPoint touchLocation = [touch locationInView:_contentView];
         [self didTouchAt:touchLocation];
