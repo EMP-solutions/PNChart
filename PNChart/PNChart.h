@@ -23,7 +23,7 @@ FOUNDATION_EXPORT const unsigned char PNChartVersionString[];
 #import "PNColor.h"
 #import "PNBar.h"
 #import "PNBarChart.h"
-#import "PNCircleChart.h"
+//#import "PNCircleChart.h"
 //#import "PNLineChart.h"
 //#import "PNLineChartData.h"
 //#import "PNLineChartDataItem.h"
