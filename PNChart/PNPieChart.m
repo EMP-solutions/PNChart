@@ -354,58 +354,14 @@
         {
             [_contentView.layer addSublayer:self.sectorHighlight];
         }
-    }else {
-        if (!self.enableMultipleSelection)
-            {
-            if (self.sectorHighlight)
-                [self.sectorHighlight removeFromSuperlayer];
-            }
-        
-        PNPieChartDataItem *currentItem = [self dataItemForIndex:index];
-        
-        CGFloat red,green,blue,alpha;
-        UIColor *old = currentItem.color;
-        [old getRed:&red green:&green blue:&blue alpha:&alpha];
-       // alpha = 1;
-        UIColor *newColor = [UIColor colorWithRed:red green:green blue:blue alpha:alpha];
-        
-        CGFloat startPercentage = [self startPercentageForItemAtIndex:index];
-        CGFloat endPercentage   = [self endPercentageForItemAtIndex:index];
-        
-        self.sectorHighlight = [self newCircleLayerWithRadius:_outerCircleRadius + 5
-                                                  borderWidth:12
-                                                    fillColor:[UIColor clearColor]
-                                                  borderColor:newColor
-                                              startPercentage:startPercentage
-                                                endPercentage:endPercentage];
-        
-        if (self.enableMultipleSelection)
-            {
-            NSString *dictIndex = [NSString stringWithFormat:@"%d", index];
-            CAShapeLayer *indexShape = [self.selectedItems valueForKey:dictIndex];
-            if (indexShape)
-                {
-                [indexShape removeFromSuperlayer];
-                [self.selectedItems removeObjectForKey:dictIndex];
-                }
-            else
-                {
-                [self.selectedItems setObject:self.sectorHighlight forKey:dictIndex];
-                [_contentView.layer addSublayer:self.sectorHighlight];
-                }
-            }
-        else
-            {
-            [_contentView.layer addSublayer:self.sectorHighlight];
-            }
     }
 }
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    if (!_shouldHighlightSectorOnTouch) {
-        return;
-    }
+//    if (!_shouldHighlightSectorOnTouch) {
+//        return;
+//    }
     for (UITouch *touch in touches) {
         CGPoint touchLocation = [touch locationInView:_contentView];
         [self didTouchAt:touchLocation];
