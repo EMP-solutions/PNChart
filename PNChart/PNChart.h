@@ -34,5 +34,5 @@ FOUNDATION_EXPORT const unsigned char PNChartVersionString[];
 //#import "PNRadarChartDataItem.h"
 #import "PieChartConfiguration.h"
 #import "PieChartItem.h"
-#import "PieChartView.h"
+#import "PNPieChartView.h"
 #import "PNChart.h"
