@@ -6,7 +6,7 @@
 //
 //  http://github.com/vitorventurin
 
-#import "PieChartView.h"
+#import "PNPieChartView.h"
 
 typedef enum {
     AnimationStateDeselecting = 0,
@@ -15,7 +15,7 @@ typedef enum {
     AnimationStateNoAnimaton,
 } AnimationState;
 
-@interface PieChartView()
+@interface PNPieChartView()
 
 @property(nonatomic,weak) PieChartItem *lastSelectedItem;
 @property(nonatomic,assign) CGFloat animationFrequency;
@@ -32,7 +32,7 @@ typedef enum {
 @end
 
 
-@implementation PieChartView
+@implementation PNPieChartView
 
 //UITapGestureRecognizer* tapRecognizer;
 
@@ -193,7 +193,7 @@ typedef enum {
         //Angle settings
         CGFloat radious = self.frame.size.width*.85/2;
         if ([self.lastSelectedItem isEqual:item]) {
-            radious += radious * selectedPercentage;
+            radious += (radious * selectedPercentage)-5;
         }
         
         CGFloat toAngle = lastAngle + item.percentage*2*M_PI;
@@ -224,7 +224,6 @@ typedef enum {
             radious += radious * selectedPercentage/2;
         }
         
-        
         CGFloat toAngle = lastAngle + item.percentage*2*M_PI;
         
         CGContextAddArc(context, self.frame.size.width/2,self.frame.size.height/2,radious,lastAngle,toAngle,NO);
@@ -241,7 +240,7 @@ typedef enum {
     CGContextSetFillColorWithColor(context,[[UIColor whiteColor] CGColor]);
     
     CGFloat radious = self.frame.size.width/2;
-    radious = radious * 0.4;
+    radious = radious * 0.5;
     CGContextAddArc(context, self.frame.size.width/2,self.frame.size.height/2,radious,0,2*M_PI,NO);
     CGContextClosePath(context);
     CGContextDrawPath(context,kCGPathFillStroke);

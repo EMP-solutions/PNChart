@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "PieChartConfiguration.h"
 
-@interface PieChartView : UIView
+@interface PNPieChartView : UIView
 
 @property (nonatomic, strong) PieChartConfiguration* configuration;
 @property(nonatomic,strong) PieChartItem* selectedItem;
